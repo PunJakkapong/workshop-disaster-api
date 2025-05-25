@@ -38,27 +38,24 @@ func SetupRouter(db *sql.DB, rdb *redis.Client) *gin.Engine {
 	// Initialize controllers
 	areaController := controllers.NewAreaController(db)
 	truckController := controllers.NewTruckController(db)
-	assignmentController := controllers.NewAssignmentController(db)
+	assignmentController := controllers.NewAssignmentController(db, rdb)
 
 	// API routes
 	api := r.Group("/api")
 	{
 		// Areas
-		areas := api.Group("/areas")
-		{
-			areas.POST("", areaController.CreateArea)
-			areas.GET("", areaController.ListAreas)
-			areas.GET("/:id", areaController.GetArea)
-		}
+		api.POST("/areas", areaController.CreateArea)
 
 		// Trucks
-		trucks := api.Group("/trucks")
-		{
-			trucks.POST("", truckController.CreateTruck)
-		}
+		api.POST("/trucks", truckController.CreateTruck)
 
 		// Assignments
-		api.POST("/assignments", assignmentController.CreateAssignment)
+		assignments := api.Group("/assignments")
+		{
+			assignments.POST("", assignmentController.CreateAssignment)
+			assignments.GET("", assignmentController.GetAssignments)
+			assignments.DELETE("", assignmentController.DeleteAssignments)
+		}
 	}
 
 	return r
