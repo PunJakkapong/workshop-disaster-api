@@ -1,15 +1,14 @@
-# ใช้ Official Golang Image
-FROM golang:latest
+FROM golang:1.21-alpine
 
-# ตั้งค่า Work Directory
 WORKDIR /app
 
-# คัดลอกไฟล์ทั้งหมดไปยัง Docker
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
 COPY . .
 
-# ดึง Dependencies และ Build
-RUN go mod tidy
-RUN go build -o app .
+RUN go build -o main .
 
-# รันโปรแกรม
-CMD ["/app/app"]
+EXPOSE 8080
+CMD ["./main"]
