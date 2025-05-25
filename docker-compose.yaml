@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   redis:
     image: redis:latest
@@ -18,14 +17,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  golang-api:
+    build: .
+    container_name: golang-api-container
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    depends_on:
+      - redis
+      - postgres
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   postgres_data:
-
-  # golang-api:
-  #   build: .
-  #   container_name: golang-api-container
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - redis
-  #     - postgres
