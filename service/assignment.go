@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strings"
 	"workship-disaster-api/models"
 )
 
@@ -36,23 +35,33 @@ func (s *AssignmentService) CreateAssignments() ([]models.Assignment, error) {
 		var bestTravelTime int
 		var deliveredResources map[string]int
 
+		// Variables to handle edge cases
+		hasTruckWithTravelTimeEntry := false
+		hasTruckWithSufficientResources := false
+		hasTruckWithSufficientResourcesAndTime := false
+
 		for _, truck := range trucks {
 			if usedTrucks[truck.ID] {
 				continue
 			}
 
 			travelTime, ok := truck.TravelTimeToArea[area.ID]
-			// If truck travel time not enough
-			if !ok || travelTime > area.TimeConstraint {
-				continue
+			if ok {
+				hasTruckWithTravelTimeEntry = true
 			}
 
 			// If truck resource can fill area required resource
 			if canFulfill(truck.AvailableResources, area.RequiredResource) {
-				// If current truck travel time is best
-				if bestTruck == nil || travelTime < bestTravelTime {
-					bestTruck = &truck
-					bestTravelTime = travelTime
+				hasTruckWithSufficientResources = true
+
+				if ok && travelTime <= area.TimeConstraint {
+					hasTruckWithSufficientResourcesAndTime = true
+
+					// If current truck travel time is best
+					if bestTruck == nil || travelTime < bestTravelTime {
+						bestTruck = &truck
+						bestTravelTime = travelTime
+					}
 				}
 			}
 		}
@@ -69,14 +78,21 @@ func (s *AssignmentService) CreateAssignments() ([]models.Assignment, error) {
 				ResourcesDelivered: deliveredResources,
 			})
 		} else {
-			msg := "No trucks available, Remaining resources needed:"
-			parts := []string{}
-			for k, v := range area.RequiredResource {
-				parts = append(parts, fmt.Sprintf(" %s: %d", k, v))
+			// Create detailed fallback message
+			var msg string
+			if !hasTruckWithTravelTimeEntry {
+				msg = "No trucks have a valid route to this area."
+			} else if !hasTruckWithSufficientResources {
+				msg = "No truck has sufficient resources to fulfill this area's needs."
+			} else if !hasTruckWithSufficientResourcesAndTime {
+				msg = "All trucks with sufficient resources exceed the time constraint."
+			} else {
+				msg = "No trucks available for assignment."
 			}
+
 			assignments = append(assignments, models.Assignment{
 				AreaID:  area.ID,
-				Message: msg + strings.Join(parts, ","),
+				Message: msg,
 			})
 		}
 	}
