@@ -1,6 +1,6 @@
 module workship-disaster-api
 
-go 1.22.6
+go 1.22
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect

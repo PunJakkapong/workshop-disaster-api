@@ -13,9 +13,12 @@ var ctx = context.Background()
 // ConnectRedis establishes a connection to Redis
 func ConnectRedis() (*redis.Client, error) {
 	redisAddr := fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+	redisPassword := os.Getenv("REDIS_PASSWORD")
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr: redisAddr,
+		Addr:     redisAddr,
+		Password: redisPassword,
+		DB:       0, // use default DB
 	})
 
 	// Test the connection

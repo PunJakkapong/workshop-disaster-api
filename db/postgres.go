@@ -58,8 +58,6 @@ func ConnectPostgres() (*sql.DB, error) {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_DB"))
 
-	fmt.Println(postgresURL)
-
 	db, err := sql.Open("postgres", postgresURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to PostgreSQL: %v", err)

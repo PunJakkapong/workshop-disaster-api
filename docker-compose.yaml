@@ -1,21 +1,21 @@
 services:
-  redis:
-    image: redis:latest
-    container_name: redis-container
-    ports:
-      - "${REDIS_PORT}:6379"
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis-container
+  #   ports:
+  #     - "${REDIS_PORT}:6379"
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres-container
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:latest
+  #   container_name: postgres-container
+  #   ports:
+  #     - "${POSTGRES_PORT}:5432"
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
 
   golang-api:
     build: .
@@ -23,20 +23,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-      - POSTGRES_HOST=postgres
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-    depends_on:
-      - redis
-      - postgres
+    # depends_on:
+    #   - redis
+    #   - postgres
+# networks:
+#   app-network:
+#     driver: bridge
 
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  postgres_data:
+# volumes:
+#   postgres_data:

@@ -1,14 +1,15 @@
-FROM golang:1.21-alpine
+# ใช้ Official Golang Image
+FROM golang:1.22.0 AS builder
 
+# ตั้งค่า Work Directory
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
-RUN go mod download
-
+# คัดลอกไฟล์ทั้งหมดไปยัง Container
 COPY . .
 
-RUN go build -o main .
+# ดึง Dependencies และ Build ให้เป็น Linux Binary
+RUN go mod tidy
+RUN GOARCH=amd64 GOOS=linux go build -o /app/app .
 
-EXPOSE 8080
-CMD ["./main"]
+# รันโปรแกรม
+CMD ["/app/app"]
