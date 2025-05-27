@@ -14,7 +14,7 @@ API สำหรับจัดการข้อมูลภัยพิบั�
 1. Clone repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/PunJakkapong/workshop-disaster-api.git
 cd workshop-disaster-api
 ```
 
@@ -98,45 +98,3 @@ docker-compose up -d
 - `POST /api/v1/disasters` - เพิ่มข้อมูลภัยพิบัติใหม่
 - `PUT /api/v1/disasters/{id}` - อัพเดทข้อมูลภัยพิบัติ
 - `DELETE /api/v1/disasters/{id}` - ลบข้อมูลภัยพิบัติ
-
-## การ Deploy ไปยัง Azure
-
-1. Build และ Push Docker image ไปยัง Azure Container Registry:
-
-```bash
-# Login to Azure Container Registry
-az acr login --name your-registry-name
-
-# Build image
-docker build -t your-registry.azurecr.io/workshop-disaster-api-golang-api:v1 .
-
-# Push image
-docker push your-registry.azurecr.io/workshop-disaster-api-golang-api:v1
-```
-
-2. Deploy ไปยัง Azure Container Apps:
-
-```bash
-az containerapp create \
-  --name your-app-name \
-  --resource-group your-resource-group \
-  --image your-registry.azurecr.io/workshop-disaster-api-golang-api:v1 \
-  --target-port 8080 \
-  --ingress external \
-  --env-vars \
-    DB_HOST=your-db-host \
-    DB_PASSWORD=your-db-password \
-    REDIS_HOST=your-redis-host
-```
-
-## การทดสอบ
-
-รัน unit tests:
-
-```bash
-go test ./...
-```
-
-## License
-
-MIT
